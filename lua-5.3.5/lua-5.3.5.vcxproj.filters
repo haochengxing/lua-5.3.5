@@ -123,6 +123,18 @@
     <ClCompile Include="src\lzio.c">
       <Filter>源文件\src</Filter>
     </ClCompile>
+    <ClCompile Include="stduy0.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stduy1.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="study2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mLualib.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\lapi.h">
@@ -202,6 +214,9 @@
     </ClInclude>
     <ClInclude Include="src\lzio.h">
       <Filter>源文件\src</Filter>
+    </ClInclude>
+    <ClInclude Include="mLualib.h">
+      <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

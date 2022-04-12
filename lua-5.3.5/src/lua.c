@@ -598,7 +598,7 @@ static int pmain (lua_State *L) {
  * argc：行参数的个数
  * argv：每个参数的值，指针结构
  */
-int main(int argc, char **argv) {
+int main_(int argc, char **argv) {
 	int status, result;
 	/* 第一步：创建一个主线程栈数据结构 */
 	lua_State *L = luaL_newstate();  /* create state */

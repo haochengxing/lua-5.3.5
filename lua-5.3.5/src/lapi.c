@@ -265,7 +265,7 @@ LUA_API void lua_copy (lua_State *L, int fromidx, int toidx) {
   lua_unlock(L);
 }
 
-
+/* 将idx索引上的值的副本压入栈顶 */
 LUA_API void lua_pushvalue (lua_State *L, int idx) {
   lua_lock(L);
   setobj2s(L, L->top, index2addr(L, idx));

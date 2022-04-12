@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="mLualib.cpp" />
     <ClCompile Include="src\lapi.c" />
     <ClCompile Include="src\lauxlib.c" />
     <ClCompile Include="src\lbaselib.c" />
@@ -178,8 +179,12 @@
     <ClCompile Include="src\lutf8lib.c" />
     <ClCompile Include="src\lvm.c" />
     <ClCompile Include="src\lzio.c" />
+    <ClCompile Include="stduy0.cpp" />
+    <ClCompile Include="stduy1.cpp" />
+    <ClCompile Include="study2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mLualib.h" />
     <ClInclude Include="src\lapi.h" />
     <ClInclude Include="src\lauxlib.h" />
     <ClInclude Include="src\lcode.h" />
