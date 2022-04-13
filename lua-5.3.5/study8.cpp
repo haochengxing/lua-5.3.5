@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string.h>
-using namespace std;
 
 extern "C" {
 #include "src/lapi.h"
@@ -8,20 +7,15 @@ extern "C" {
 #include "src/lualib.h"
 }
 
-#include "StudentRegFuncs.h"
-
-void main_7() {
+void main() {
 	lua_State* L = luaL_newstate();
 	if (L == NULL) {
 		return;
 	}
 
-	luaL_openlibs(L);
+	luaopen_base(L);
 
-	luaL_requiref(L,"Student",luaopen_student_libs,1);
-	lua_pop(L, 1);
-
-	int bRet = luaL_loadfile(L,"student.lua");
+	int bRet = luaL_loadfile(L,"gc.lua");
 	if (bRet) {
 		return;
 	}
@@ -32,5 +26,6 @@ void main_7() {
 	}
 
 	lua_close(L);
+
 	return;
 }

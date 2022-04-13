@@ -189,6 +189,7 @@
     <ClCompile Include="study5.cpp" />
     <ClCompile Include="study6.cpp" />
     <ClCompile Include="study7.cpp" />
+    <ClCompile Include="study8.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mLualib.h" />

@@ -156,6 +156,9 @@
     <ClCompile Include="study7.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="study8.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\lapi.h">

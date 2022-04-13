@@ -266,6 +266,7 @@ static void markupval (FuncState *fs, int level) {
 /*
   Find variable with given name 'n'. If it is an upvalue, add this
   upvalue into all intermediate functions.
+  首先是在函数级别的Local中查找，如果查找则认为是VLOCAL类型，否则查找当前函数已经存在的upvalue，最后默认认为是在全局变量表中。这个“全局”就是很高级别了，相当于整个lua虚拟机共享，也就是全局变量了。
 */
 static void singlevaraux(FuncState *fs, TString *n, expdesc *var, int base) {
 	if (fs == NULL)  /* 全局变量 no more levels? */
@@ -297,6 +298,7 @@ static void singlevaraux(FuncState *fs, TString *n, expdesc *var, int base) {
 //单个变量名称处理
 // * Lua 中的变量全是全局变量，无论语句块或是函数里，除非用 local 显式声明为局部变量，变量默认值均为nil
 // 使用local创建一个局部变量，与全局变量不同，局部变量只在被声明的那个代码块内有效。
+/* 对于一个变量g，如果从local和upvalue中没有查找到，则认为是从全局env中使用变量名为字符串进行查找，并且在luaK_indexed函数中为key分配寄存器，也就是全局变量的查找同样需要使用寄存器。 */
 static void singlevar (LexState *ls, expdesc *var) {
   TString *varname = str_checkname(ls);//获取变量名称  获取的时候执行了：luaX_next
   FuncState *fs = ls->fs;
@@ -1471,7 +1473,7 @@ static void localfunc (LexState *ls) {
   getlocvar(fs, b.u.info)->startpc = fs->pc;
 }
 
-
+/* Local变量的处理流程 */
 static void localstat (LexState *ls) {
   /* stat -> LOCAL NAME {',' NAME} ['=' explist] */
   int nvars = 0;

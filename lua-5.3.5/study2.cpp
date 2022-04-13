@@ -9,7 +9,7 @@ extern "C"
 #include "src/lualib.h"  
 #include "mLualib.h"
 }
-void main__()
+void main_2()
 {
     //1.´´½¨Lua×´Ì¬  
     lua_State* L = luaL_newstate();

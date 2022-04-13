@@ -15,4 +15,4 @@ print(student_obj:get_age())
 student_obj:print()
 print(student_obj)
 student_obj = nil
-collectgarbage("collect")
+collectgarbage()

@@ -449,7 +449,15 @@ static void traversestrongtable (global_State *g, Table *h) {
   }
 }
 
+/*
+弱表是一个表且拥有metatable元表，并在metatable中定义了__mode字段。
+一个表的弱引用类型是通过其元素的__mode模式字段来决定的，__mode模式的值是一个字符串，如果字符串中包含字母k,则这个表的key键名是弱引用。如果字符串中包含字母v则表的value键值是弱引用的。
+__mode字段取值可分为k、v、kv
+1. k表示table.key是weak的，也就是table的keys是能够被垃圾收集器自动回收。
+2. v表示table.value是weak的，也就是table的values能够被垃圾收集器自动回收。
+3. kv是二者的组合，任何情况下只要key和value中的一个被垃圾收集器自动回收，那么kv键值对就被从表中移除。
 
+*/
 static lu_mem traversetable (global_State *g, Table *h) {
   const char *weakkey, *weakvalue;
   const TValue *mode = gfasttm(g, h->metatable, TM_MODE);

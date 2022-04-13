@@ -8,7 +8,7 @@ extern "C"
 #include "src/lauxlib.h"  
 #include "src/lualib.h"  
 }
-void main_()
+void main_0()
 {
     //1.创建一个state  
     lua_State* L = luaL_newstate();
