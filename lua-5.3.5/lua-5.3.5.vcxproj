@@ -181,7 +181,14 @@
     <ClCompile Include="src\lzio.c" />
     <ClCompile Include="stduy0.cpp" />
     <ClCompile Include="stduy1.cpp" />
+    <ClCompile Include="Student.cpp" />
+    <ClCompile Include="StudentRegFuncs.cpp" />
     <ClCompile Include="study2.cpp" />
+    <ClCompile Include="study3.cpp" />
+    <ClCompile Include="study4.cpp" />
+    <ClCompile Include="study5.cpp" />
+    <ClCompile Include="study6.cpp" />
+    <ClCompile Include="study7.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mLualib.h" />
@@ -211,6 +218,8 @@
     <ClInclude Include="src\lundump.h" />
     <ClInclude Include="src\lvm.h" />
     <ClInclude Include="src\lzio.h" />
+    <ClInclude Include="Student.h" />
+    <ClInclude Include="StudentRegFuncs.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Makefile" />

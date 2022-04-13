@@ -778,7 +778,7 @@ LUA_API int lua_rawget (lua_State *L, int idx) {
   return ttnov(L->top - 1);
 }
 
-
+/* 对应的lua_rawget函数。获取索引号n的数组值，返回的int值为值的类型。这是一次直接访问，不会触发元方法，效率高。 */
 LUA_API int lua_rawgeti (lua_State *L, int idx, lua_Integer n) {
   StkId t;
   lua_lock(L);
@@ -957,7 +957,7 @@ LUA_API void lua_rawset (lua_State *L, int idx) {
   lua_unlock(L);
 }
 
-
+/* 对应的lua_rawset函数 设置索引号n的数组值。这个函数会将值弹出栈。 赋值是直接的；即不会触发元方法，效率高。 */
 LUA_API void lua_rawseti (lua_State *L, int idx, lua_Integer n) {
   StkId o;
   lua_lock(L);

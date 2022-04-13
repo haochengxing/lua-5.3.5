@@ -86,7 +86,7 @@ static int getTwoVar(lua_State* L)
 }
 
 
-void main()
+void main___()
 {
     //1.´´½¨Lua×´Ì¬  
     lua_State* L = luaL_newstate();

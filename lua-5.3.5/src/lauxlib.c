@@ -801,7 +801,7 @@ LUALIB_API int luaL_callmeta (lua_State *L, int obj, const char *event) {
   return 1;
 }
 
-
+/* 使用于数组，可得到数组元素个数；以数字形式返回给定索引处值的“长度”； 它等价于在 Lua 中调用 '#' 的操作。（非数组使用#将得不到正确的值）如果操作结果不是一个整数，则抛出一个错误。（这种情况只发生在触发元方法时。） */
 LUALIB_API lua_Integer luaL_len (lua_State *L, int idx) {
   lua_Integer l;
   int isnum;

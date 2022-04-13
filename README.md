@@ -10,3 +10,8 @@ https://blog.csdn.net/liutianshx2012/category_2775545.html
 
 https://blog.csdn.net/m1234567q/article/details/114888047
 
+转载《Lua和C++交互 学习记录之九：在Lua中以面向对象的方式使用C++注册的类》
+
+https://www.cnblogs.com/chevin/p/5897220.html
+
+
