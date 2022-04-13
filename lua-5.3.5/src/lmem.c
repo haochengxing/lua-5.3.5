@@ -83,6 +83,8 @@ l_noret luaM_toobig (lua_State *L) {
 **
 ** osize = 老的内存块大小  这参数没用上
 **
+** lua新建对象luaM_newobject与释放内存luaM_freemem都是通过调用luaM_realloc完成的
+** GCdebt大于零则意味着有需要GC释放还未释放的内存，所以会触发GC。
 */
 void *luaM_realloc_ (lua_State *L, void *block, size_t osize, size_t nsize) {
   void *newblock;
@@ -104,7 +106,7 @@ void *luaM_realloc_ (lua_State *L, void *block, size_t osize, size_t nsize) {
       luaD_throw(L, LUA_ERRMEM);
   }
   lua_assert((nsize == 0) == (newblock == NULL));
-  g->GCdebt = (g->GCdebt + nsize) - realosize;
+  g->GCdebt = (g->GCdebt + nsize) - realosize;//当新增分配内存时，GCdebt值将会增加，即GC需要释放的内存增加；当释放内存时，GCdebt将会减少，即GC需要释放的内存减少。
   return newblock;
 }
 

@@ -1181,6 +1181,7 @@ LUA_API int lua_status (lua_State *L) {
 
 /*
 ** Garbage-collection function
+*  GC触发条件,手动式触发GC
 */
 
 LUA_API int lua_gc (lua_State *L, int what, int data) {

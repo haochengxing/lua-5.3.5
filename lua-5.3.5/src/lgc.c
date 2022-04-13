@@ -206,6 +206,7 @@ void luaC_fix (lua_State *L, GCObject *o) {
 /*
 ** create a new collectable object (with given type and size) and link
 ** it to 'allgc' list.
+*  白色：可回收状态。如果该对象未被GC标记过则此时白色代表当前对象为待访问状态。
 */
 GCObject *luaC_newobj (lua_State *L, int tt, size_t sz) {
   global_State *g = G(L);
@@ -233,12 +234,14 @@ GCObject *luaC_newobj (lua_State *L, int tt, size_t sz) {
 ** and turned black here. Other objects are marked gray and added
 ** to appropriate list to be visited (and turned black) later. (Open
 ** upvalues are already linked in 'headuv' list.)
+*  其他类型加入灰色链或其他的辅助标记链。
 */
 static void reallymarkobject (global_State *g, GCObject *o) {
  reentry:
   white2gray(o);
   switch (o->tt) {
     case LUA_TSHRSTR: {
+        //如果是字符串类型，因为其特殊性，可以直接判定为黑。
       gray2black(o);
       g->GCmemtrav += sizelstring(gco2ts(o)->shrlen);
       break;
@@ -335,6 +338,8 @@ static void remarkupvals (global_State *g) {
 
 /*
 ** mark root set and reset all gray lists, to start a new collection
+*  1.将用于辅助标记的各类型对象链表进行初始化清空，其中g->gray是灰色节点链；g->grayagain是需要原子操作标记的灰色节点链；g->weak、g->allweak、g->ephemeron是与弱表相关的链。
+*  2.然后依次利用markobject、markvalue、markmt、markbeingfnz标记根(全局)对象:mainthread(主线程(协程), 注册表(registry), 全局元表(metatable), 上次GC循环中剩余的finalize中的对象，并将其加入对应的辅助标记链中。
 */
 static void restartcollection (global_State *g) {
   g->gray = g->grayagain = NULL;
@@ -565,6 +570,9 @@ static lu_mem traversethread (global_State *g, lua_State *th) {
 /*
 ** traverse one gray object, turning it to black (except for threads,
 ** which are always gray).
+*  每次只会从灰色链表中取一个灰色节点，将其置为黑(与lua5.1的GC有区别)，从灰色链表中出去，遍历与此节点相关的其他节点，并将有关节点加入到灰色链中，至此就完成了一次GCSpropagate状态处理。
+*  反复执行这个状态对应的处理函数。直到状态发生改变后，进入下一个状态。
+*  终都会执行到reallymarkobject这个方法上
 */
 static void propagatemark (global_State *g) {
   lu_mem size;
@@ -741,6 +749,7 @@ static GCObject **sweeplist (lua_State *L, GCObject **p, lu_mem count);
 ** white; change all non-dead objects back to white, preparing for next
 ** collection cycle. Return where to continue the traversal or NULL if
 ** list is finished.
+*  可回收数据类型对象链表都是很长的，所以清除也是分段完成的，比如可以通过sweeplist中的count参数来控制每次清理的数量。
 */
 static GCObject **sweeplist (lua_State *L, GCObject **p, lu_mem count) {
   global_State *g = G(L);
@@ -988,7 +997,15 @@ void luaC_freeallobjects (lua_State *L) {
   lua_assert(g->strt.nuse == 0);
 }
 
+/*
 
+1重新遍历(跟踪)根对象。
+2遍历之前的grayagain(grayagain上会有弱表的存在), 并清理弱表的空间。
+3调用separatetobefnz函数将带__gc函数的需要回收的(白色)对象放到global_State.tobefnz表中,留待以后清理。
+4.使global_State.tobefnz上的所有对象全部可达。
+5.将当前白色值切换到新一轮的白色值。
+
+*/
 static l_mem atomic (lua_State *L) {
   global_State *g = G(L);
   l_mem work;
@@ -1051,17 +1068,22 @@ static lu_mem sweepstep (lua_State *L, global_State *g,
   return 0;
 }
 
-
+/* 
+GC函数状态机
+lua的GC过程是非搬迁式的，即没有对数据进行迁移，不做内存整理。
+*/
 static lu_mem singlestep (lua_State *L) {
   global_State *g = G(L);
   switch (g->gcstate) {
     case GCSpause: {
+        // 从根对象开始标记，将白色置为灰色，并加入到灰色链表中 该步骤实际对应状态：GCSpause
       g->GCmemtrav = g->strt.size * sizeof(GCObject*);
       restartcollection(g);
       g->gcstate = GCSpropagate;
       return g->GCmemtrav;
     }
     case GCSpropagate: {
+        //灰色链表是否为空 从灰色链表中取出一个对象将其标记为黑色，并遍历和这个对象相关联的其他对象 
       g->GCmemtrav = 0;
       lua_assert(g->gray);
       propagatemark(g);
@@ -1070,6 +1092,7 @@ static lu_mem singlestep (lua_State *L) {
       return g->GCmemtrav;  /* memory traversed in this step */
     }
     case GCSatomic: {
+        //对灰色链表进行一次清除且保证是原子操作。
       lu_mem work;
       propagateall(g);  /* make sure gray list is empty */
       work = atomic(L);  /* work is what was traversed by 'atomic' */
@@ -1077,16 +1100,16 @@ static lu_mem singlestep (lua_State *L) {
       g->GCestimate = gettotalbytes(g);  /* first estimate */;
       return work;
     }
-    case GCSswpallgc: {  /* sweep "regular" objects */
+    case GCSswpallgc: {  /* sweep "regular" objects 据不同类型的对象，进行分步回收。回收中遍历不同类型对象的存储链表 */
       return sweepstep(L, g, GCSswpfinobj, &g->finobj);
     }
-    case GCSswpfinobj: {  /* sweep objects with finalizers */
+    case GCSswpfinobj: {  /* sweep objects with finalizers 对象存储链表是否到达链尾 */
       return sweepstep(L, g, GCSswptobefnz, &g->tobefnz);
     }
-    case GCSswptobefnz: {  /* sweep objects to be finalized */
+    case GCSswptobefnz: {  /* sweep objects to be finalized 逐个判断对象颜色是否为白 STEP10：释放对象所占用的空间 */
       return sweepstep(L, g, GCSswpend, NULL);
     }
-    case GCSswpend: {  /* finish sweeps */
+    case GCSswpend: {  /* finish sweeps 将对象颜色置为白 */
       makewhite(g, g->mainthread);  /* sweep main thread */
       checkSizes(L, g);
       g->gcstate = GCScallfin;
@@ -1110,6 +1133,7 @@ static lu_mem singlestep (lua_State *L) {
 /*
 ** advances the garbage collector until it reaches a state allowed
 ** by 'statemask'
+*  GC状态机
 */
 void luaC_runtilstate (lua_State *L, int statesmask) {
   global_State *g = G(L);
@@ -1135,6 +1159,8 @@ static l_mem getdebt (global_State *g) {
 
 /*
 ** performs a basic GC step when collector is running
+*  当lua使用的内存达到阀值，便会触发GC
+*  当GCdebt大于零时，即会触发自动GC
 */
 void luaC_step (lua_State *L) {
   global_State *g = G(L);

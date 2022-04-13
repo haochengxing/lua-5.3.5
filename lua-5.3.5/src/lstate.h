@@ -163,25 +163,25 @@ typedef struct global_State {
 
 	/* GC管理 */
 	unsigned int gcfinnum;  /* number of finalizers to call in each GC step */
-	int gcpause;  /* size of pause between successive GCs */
-	int gcstepmul;  /* GC 'granularity' */
+	int gcpause;  /* size of pause between successive GCs 需要设定下一次GC循环的等待时间 */
+	int gcstepmul;  /* GC 'granularity' 是GCdebt的一个倍率，上述getdebt函数的核心功能为debt=debt*stepmul。 */
 
-	l_mem totalbytes;  /* number of bytes currently allocated - GCdebt */
-	l_mem GCdebt;  /* bytes allocated not yet compensated by the collector */
+	l_mem totalbytes;  /* number of bytes currently allocated - GCdebt 为实际内存分配器所分配的内存与GCdebt的差值。 */
+	l_mem GCdebt;  /* bytes allocated not yet compensated by the collector 需要回收的内存数量。 */
 	lu_mem GCmemtrav;  /* memory traversed by the GC */
-	lu_mem GCestimate;  /* an estimate of the non-garbage memory in use */
+	lu_mem GCestimate;  /* an estimate of the non-garbage memory in use 内存实际使用量的估计值。 */
 
 	TValue l_registry;
 	unsigned int seed;  /* randomized seed for hashes */
-	lu_byte currentwhite;
-	lu_byte gcstate;  /* state of garbage collector */
+	lu_byte currentwhite;/* gc流程中的当前白色，如果清理阶段某个对象是otherwhite，那么他就会被清理掉 */
+	lu_byte gcstate;  /* state of garbage collector 控制gc流程的 */
 	lu_byte gckind;  /* kind of GC running */
 	lu_byte gcrunning;  /* true if GC is running */
 	GCObject *allgc;  /* list of all collectable objects 长字符串，一般很少做索引或者比较，所以长字符串直接链接到allgc 链表上 做GC 对象来处理*/
 	GCObject **sweepgc;  /* current position of sweep in list */
 	GCObject *finobj;  /* list of collectable objects with finalizers */
-	GCObject *gray;  /* list of gray objects */
-	GCObject *grayagain;  /* list of objects to be traversed atomically */
+	GCObject *gray;  /* list of gray objects 为了gc的效率增加的一个gc链表 */
+	GCObject *grayagain;  /* list of objects to be traversed atomically 为了实现增量式gc，过程中处理中断问题的一个链表 */
 	GCObject *weak;  /* list of tables with weak values */
 	GCObject *ephemeron;  /* list of ephemeron tables (weak keys) */
 	GCObject *allweak;  /* list of all-weak tables */

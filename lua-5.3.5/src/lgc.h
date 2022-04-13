@@ -106,6 +106,9 @@
 ** allows some adjustments to be done only when needed. macro
 ** 'condchangemem' is used only for heavy tests (forcing a full
 ** GC cycle on every opportunity)
+*  GC触发条件,自动动式触发GC
+*  lua在每次分配新的内存时，会主动检查是否满足GC条件。
+*  大部分会引起内存增长的API中，都调用了luaC_checkGC。
 */
 #define luaC_condGC(L,pre,pos) \
 	{ if (G(L)->GCdebt > 0) { pre; luaC_step(L); pos;}; \
