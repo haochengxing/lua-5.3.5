@@ -34,15 +34,19 @@
 
 #### 一. 概述
 1. Vector3的定义
+
 	`public struct Vector3`，是一个struct 结构体，值类型。
 
 2. 主要优化的是什么？
+
 	主要优化 减少gc + 减少lua与C#的交互。
 
 2. 为什么会产生gc？
+
 	原因是boxing（装箱）和unboxing（拆箱）。Vector3（栈）转为object类型需要boxing（堆内存中），object转回Vector3需要unboxing，使用后释放该object引用，这个堆内存被gc检测到已经没引用，释放该堆内存，产生一个gc内存。
 
 3. 如何优化gc？
+
 	值拷贝
 
 
@@ -58,6 +62,7 @@
 	1.3 C#中new一个Vector3：`UnityEngine.Vector3 __cl_gen_ret = new UnityEngine.Vector3(x, y, z);`
 
 	1.4 `translator.PushUnityEngineVector3(L, __cl_gen_ret);`
+	
 	要注意的是push方法是`PushUnityEngineVector3`，普通是`translator.Push`
 
 	<div align="left">
@@ -111,6 +116,7 @@
 	5.1 创建Vector3对象：`aTransform.position = CS.UnityEngine.Vector3(7, 8, 9)`
 
 	5.2 Table替代 :  `aTransform.position = {x = 1, y = 2, z = 3}`
+	
 	直接调用 `CopyByValue.UnPack`，将Table的x，y，z值取出，设置到out UnityEngine.Vector3 val
 
 	<div align="left">
@@ -135,6 +141,7 @@
 6. GCOptimize -- `PushUnityEngineVector3`的由来
 
 	6.1 为何Vector3的push到lua 会有一个针对优化的接口`PushUnityEngineVector3`？
+	
 	Vector3 struct配置了GCOptimize属性（对于常用的UnityEngine的几个struct，Vector系列，Quaternion，Color。。。均已经配置了该属性），这个属性可以通过配置文件或者C# Attribute实现；
 
 	<div align="left">
@@ -142,6 +149,7 @@
 	</div>
 
 	6.2 从GCOptimize列表中去掉Vector3 会怎么样呢？
+	
 	`PushUnityEngineVector3`接口就不存在了，而Vector3的push到lua会使用`translator.Push(L, __cl_gen_ret)`; ，不做优化`public void Push(RealStatePtr L, object o)1`，会产生boxing（装箱）和unboxing（拆箱），代表着一个gc。
 
 	<div align="left">
