@@ -24,6 +24,7 @@ Unity中xLua与toLua对Vector3的优化
 
 https://it.cha138.com/jingpin/show-194524.html
 
+<a href="xlua/xLua_Vector3_GCOptimize.md">Unity中xLua与toLua对Vector3的优化[转载]</a>
 
 ```lua
 local v = CS.UnityEngine.Vector3(7, 8, 9)
