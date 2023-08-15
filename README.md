@@ -24,8 +24,12 @@ Unity中xLua与toLua对Vector3的优化
 
 https://it.cha138.com/jingpin/show-194524.html
 
-local v = CS.UnityEngine.Vector3(7, 8, 9)
 
+```lua
+local v = CS.UnityEngine.Vector3(7, 8, 9)
+```
+
+```csharp
 static int __CreateInstance(RealStatePtr L)
 {
 	var gen_ret = new UnityEngine.Vector3(_x, _y, _z);
@@ -75,6 +79,7 @@ public static bool UnPack(IntPtr buff, int offset, out UnityEngine.Vector3 field
     return true;
 }
 
+
 public static void UnPack(ObjectTranslator translator, RealStatePtr L, int idx, out UnityEngine.Vector3 val)
 {
     val = new UnityEngine.Vector3();
@@ -105,7 +110,9 @@ public static void UnPack(ObjectTranslator translator, RealStatePtr L, int idx, 
     LuaAPI.lua_pop(L, 1);
     
 }
+```
 
+```csharp
 [GCOptimize]
 static List<Type> GCOptimize
 {
@@ -123,3 +130,4 @@ static List<Type> GCOptimize
         };
     }
 }
+```
