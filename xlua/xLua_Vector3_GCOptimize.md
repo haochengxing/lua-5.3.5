@@ -2,22 +2,33 @@
 
 #### 目录
 1. 概述
+
 	1.1 Vector3的定义
+	
 	1.2 主要优化的是什么？
 
 2. xLua对Vector3的优化
+
 	2.1 xLua创建Vector3
+	
 	2.2 xLua获取Vector3 -- C#的Vector3传入lua
+	
 	2.3 xLua 设置 Vector3到C#
+	
 	2.4 GCOptimize -- `PushUnityEngineVector3`的由来
 
 3. toLua对Vector3的优化
+
 	3.1 toLua创建Vector3
+	
 	3.2 toLua获取Vector3 -- C#的Vector3传入lua
+	
 	3.3 toLua 设置 Vector3到C#
 
 4. xLua与toLua对Vector3的优化的区别
+
 	4.1 效率性能的比较
+	
 	4.2 扩展性的比较
 
 
@@ -192,8 +203,8 @@
 
 	toLua重新Lua实现的类,需要增加一种新的值类型十分困难, 数量有限,并且与Unity C# Vector3核心代码深度耦合。
 
-<div align="left">
-  <img src="tolua.png">
-</div>
+	<div align="left">
+	  <img src="tolua.png">
+	</div>
 
 6. xLua支持的struct类型宽泛的多，包含枚举，用户要做的事情也很简单，用GCOptimize声明一下类型即可。支持自定义struct。（struct要求1.含无参构造函数  2.只包含值类型，可以嵌套其它只包含值类型的struct）
